@@ -5,9 +5,9 @@ A lightweight progressive web app for measuring straight-line GPS distance from 
 ## Installation
 
 1. Open the link in **Safari** on iPhone (Chrome and other browsers do not support all required features)
-1. Tap the **Share** button at the bottom of the screen
-1. Tap **“Add to Home Screen”**
-1. Launch from your home screen for the full-screen experience
+1. Bookmark it or keep the tab open for easy access
+
+> **Note:** Adding to Home Screen is not recommended — iOS restricts location access for home screen web apps, which will prevent the app from working.
 
 ## Usage
 
@@ -33,7 +33,7 @@ Always wait for green before setting your start point for the most reliable read
 
 - **Screen must stay on** — GPS updates pause if the screen locks or you switch apps. Keep the screen active for the duration of your session.
 - **Straight-line distance only** — measures the direct distance from your start point, not the total path traveled.
-- **Safari only** — other iOS browsers do not support the required GPS and wake lock APIs.
+- **Safari only, do not add to Home Screen** — other browsers lack the required GPS APIs, and iOS restricts location access for home screen web apps. Open directly in Safari for reliable location access.
 - **Accuracy varies** — signal quality depends on your environment. Open sky gives the best results; dense buildings or tree cover will reduce accuracy.
 
 ## Export Format
