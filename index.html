@@ -222,10 +222,69 @@
       50% { opacity: 0.5; }
     }
     .pulsing { animation: pulse 2s ease-in-out infinite; }
+
+    /* Location permission overlay */
+    #permission-screen {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      padding: 40px 32px;
+      z-index: 100;
+    }
+    #permission-screen.hidden { display: none; }
+    .permission-icon { font-size: 56px; line-height: 1; }
+    .permission-title {
+      font-family: 'Space Mono', monospace;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text);
+      text-align: center;
+    }
+    .permission-body {
+      font-size: 13px;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.7;
+      max-width: 280px;
+    }
+    #enable-location-btn {
+      width: 100%;
+      max-width: 280px;
+      padding: 18px;
+      background: var(--green);
+      color: #000;
+      border: none;
+      border-radius: 12px;
+      font-family: 'Space Mono', monospace;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+    #enable-location-btn:active { opacity: 0.85; transform: scale(0.97); }
   </style>
 
 </head>
 <body>
+<!-- Location permission screen -->
+<div id="permission-screen">
+  <div class="permission-icon">📍</div>
+  <div class="permission-title">Location Access</div>
+  <div class="permission-body">
+    This app needs your location to measure distance. Tap below and choose <strong>"Allow While Using"</strong> when prompted.
+  </div>
+  <button id="enable-location-btn">Enable Location</button>
+</div>
+
 <div id="app">
   <div class="header">
     <h1>Distance Tracker</h1>
@@ -254,7 +313,7 @@
     <button class="btn btn" id="export-btn" disabled>Export Log</button>
   </div>
 
-  <div class="notice">Keep screen on while tracking</div>
+  <div class="notice">Keep screen on while tracking &nbsp;|&nbsp; Open in Safari for best results</div>
 </div>
 
 <script>
@@ -448,9 +507,28 @@
     }
   }
 
-  // --- Init ---
-  startWatching();
-  requestWakeLock();
+  // --- Permission screen ---
+  const permissionScreen = document.getElementById('permission-screen');
+  const enableBtn = document.getElementById('enable-location-btn');
+
+  enableBtn.addEventListener('click', () => {
+    permissionScreen.classList.add('hidden');
+    startWatching();
+    requestWakeLock();
+  });
+
+  // If permission was already granted in a previous session, skip the screen
+  if (navigator.permissions) {
+    navigator.permissions.query({ name: 'geolocation' }).then(result => {
+      if (result.state === 'granted') {
+        permissionScreen.classList.add('hidden');
+        startWatching();
+        requestWakeLock();
+      }
+    }).catch(() => {
+      // permissions API not available, show the screen anyway
+    });
+  }
 </script>
 
 </body>
