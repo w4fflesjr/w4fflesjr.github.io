@@ -40,7 +40,7 @@ Always wait for green before setting your start point for the most reliable read
 
 - **Screen must stay on** — GPS updates pause if the screen locks or you switch apps. Keep the screen active for the duration of your session.
 - **Straight-line distance only** — measures the direct distance from your start point, not the total path traveled.
-- **iPhone: use Safari** — other browsers lack the required GPS APIs on iOS, and iOS restricts location access for home screen web apps. Open directly in Safari for reliable location access.
+- **iPhone: use Safari** — other browsers lack the required GPS APIs on iOS. You can add to Home Screen, but uncheck **“Open as Web App”** when prompted to ensure location access works correctly.
 - **Android: use Chrome or Samsung Internet** — adding to Home Screen works correctly on Android.
 - **Accuracy varies** — signal quality depends on your environment. Open sky gives the best results; dense buildings or tree cover will reduce accuracy.
 
