@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Distance" />
+  <meta name="theme-color" content="#0a0a0f" />
+  <title>Distance Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Azeret+Mono:wght@300;400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg:        #0a0a0f;
+      --surface:   #12121a;
+      --border:    #1e1e2e;
+      --text:      #e2e2f0;
+      --muted:     #5a5a7a;
+      --green:     #22d97a;
+      --orange:    #f5a623;
+      --red:       #f5435a;
+      --blue:      #3b82f6;
+      --safe:      padding-top: env(safe-area-inset-top);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Azeret Mono', monospace;
+      overflow: hidden;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    #app {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      max-width: 430px;
+      margin: 0 auto;
+      padding: env(safe-area-inset-top, 44px) 24px env(safe-area-inset-bottom, 24px);
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px 0 8px;
+      position: relative;
+    }
+    .header h1 {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* Big distance display */
+    .distance-wrap {
+      flex: 0 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 12px 0 8px;
+    }
+    #distance-display {
+      font-family: 'Space Mono', monospace;
+      font-size: clamp(56px, 18vw, 80px);
+      font-weight: 700;
+      line-height: 1;
+      color: var(--text);
+      letter-spacing: -0.03em;
+      transition: color 0.3s;
+    }
+    #status-label {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 8px;
+      letter-spacing: 0.05em;
+      min-height: 20px;
+    }
+    #accuracy-label {
+      font-size: 12px;
+      font-weight: 600;
+      margin-top: 4px;
+      min-height: 18px;
+      transition: color 0.3s;
+      letter-spacing: 0.04em;
+    }
+
+    /* Divider */
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 12px 0;
+    }
+
+    /* Buttons */
+    .btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex: 0 0 auto;
+    }
+    .btn {
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-radius: 12px;
+      font-family: 'Space Mono', monospace;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.1s, background-color 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn:active { transform: scale(0.97); opacity: 0.85; }
+    .btn:disabled { opacity: 0.3; cursor: default; transform: none; }
+
+    .btn-start  { background: var(--green);  color: #000; }
+    .btn-log    { background: var(--blue);   color: #fff; }
+    .btn-reset  { background: var(--surface); color: var(--muted); border: 1px solid var(--border); }
+    .btn-reset.active { background: var(--red); color: #fff; border-color: var(--red); }
+
+    /* Log area */
+    .log-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      margin-top: 14px;
+    }
+    .log-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .log-title {
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    #clear-btn {
+      font-family: 'Azeret Mono', monospace;
+      font-size: 11px;
+      color: var(--red);
+      background: none;
+      border: none;
+      cursor: pointer;
+      letter-spacing: 0.05em;
+      padding: 4px 0;
+      opacity: 0.7;
+    }
+    #clear-btn:active { opacity: 1; }
+
+    #log-view {
+      flex: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      overflow-y: auto;
+      font-family: 'Azeret Mono', monospace;
+      font-size: 13px;
+      line-height: 1.7;
+      color: var(--text);
+      -webkit-overflow-scrolling: touch;
+    }
+    #log-view .empty {
+      color: var(--muted);
+      font-size: 12px;
+    }
+    #log-view .entry {
+      display: flex;
+      gap: 10px;
+    }
+    #log-view .entry .ts { color: var(--muted); flex-shrink: 0; }
+    #log-view .entry .val { color: var(--green); }
+
+    /* Export button */
+    #export-btn {
+      margin-top: 10px;
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+      font-size: 12px;
+      padding: 13px;
+      border-radius: 10px;
+      flex-shrink: 0;
+    }
+    #export-btn:disabled { opacity: 0.3; }
+    #export-btn.saved { background: var(--green); color: #000; border-color: var(--green); }
+
+    /* Screen-on notice */
+    .notice {
+      font-size: 10px;
+      color: var(--muted);
+      text-align: center;
+      margin-top: 8px;
+      letter-spacing: 0.03em;
+      opacity: 0.6;
+      flex-shrink: 0;
+    }
+
+    /* Pulse animation on tracking */
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    .pulsing { animation: pulse 2s ease-in-out infinite; }
+  </style>
+
+</head>
+<body>
+<div id="app">
+  <div class="header">
+    <h1>Distance Tracker</h1>
+  </div>
+
+  <div class="distance-wrap">
+    <div id="distance-display">0 ft</div>
+    <div id="status-label">Starting...</div>
+    <div id="accuracy-label"></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="btn-group">
+    <button class="btn btn-start" id="start-btn">Set Start Point</button>
+    <button class="btn btn-log"   id="log-btn"   disabled>Log Distance</button>
+    <button class="btn btn-reset" id="reset-btn" disabled>Reset</button>
+  </div>
+
+  <div class="log-section">
+    <div class="log-header">
+      <span class="log-title">Session Log</span>
+      <button id="clear-btn">Clear</button>
+    </div>
+    <div id="log-view"><span class="empty">No entries yet</span></div>
+    <button class="btn btn" id="export-btn" disabled>Export Log</button>
+  </div>
+
+  <div class="notice">Keep screen on while tracking</div>
+</div>
+
+<script>
+  // --- State ---
+  const state = {
+    startPoint: null,
+    watchId: null,
+    lastLoc: null,
+    logEntries: [],
+  };
+
+  // --- Elements ---
+  const distEl      = document.getElementById('distance-display');
+  const statusEl    = document.getElementById('status-label');
+  const accuracyEl  = document.getElementById('accuracy-label');
+  const startBtn    = document.getElementById('start-btn');
+  const logBtn      = document.getElementById('log-btn');
+  const resetBtn    = document.getElementById('reset-btn');
+  const logView     = document.getElementById('log-view');
+  const exportBtn   = document.getElementById('export-btn');
+  const clearBtn    = document.getElementById('clear-btn');
+
+  // --- Haversine ---
+  function haversine(lat1, lon1, lat2, lon2) {
+    const R = 20902231; // Earth radius in feet
+    const toRad = d => d * Math.PI / 180;
+    const dLat = toRad(lat2 - lat1);
+    const dLon = toRad(lon2 - lon1);
+    const a = Math.sin(dLat/2)**2 +
+              Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2)**2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  }
+
+  function formatDistance(feet) {
+    if (feet < 5280) return `${Math.round(feet)} ft`;
+    return `${(feet / 5280).toFixed(2)} mi`;
+  }
+
+  // --- Location updates ---
+  function onPosition(pos) {
+    const { latitude: lat, longitude: lon, accuracy } = pos.coords;
+    const accFeet = accuracy * 3.28084;
+    state.lastLoc = { lat, lon, accFeet };
+
+    // Accuracy traffic light
+    accuracyEl.textContent = `Signal Accuracy: +/-${Math.round(accFeet)}ft`;
+    if (accFeet <= 16) {
+      accuracyEl.style.color = 'var(--green)';
+    } else if (accFeet <= 30) {
+      accuracyEl.style.color = 'var(--orange)';
+    } else {
+      accuracyEl.style.color = 'var(--red)';
+    }
+
+    if (state.startPoint) {
+      const dist = haversine(state.startPoint.lat, state.startPoint.lon, lat, lon);
+      distEl.textContent = formatDistance(dist);
+      statusEl.textContent = 'Tracking distance';
+    } else {
+      distEl.textContent = '0 ft';
+      statusEl.textContent = accFeet <= 30 ? 'Ready' : 'Waiting for signal...';
+    }
+  }
+
+  function onError(err) {
+    if (err.code === err.PERMISSION_DENIED) {
+      statusEl.textContent = 'Location access denied';
+      accuracyEl.textContent = 'Check Settings > Privacy > Location';
+      accuracyEl.style.color = 'var(--red)';
+    } else {
+      statusEl.textContent = 'GPS unavailable';
+    }
+  }
+
+  function startWatching() {
+    if (!navigator.geolocation) {
+      statusEl.textContent = 'Geolocation not supported';
+      return;
+    }
+    state.watchId = navigator.geolocation.watchPosition(onPosition, onError, {
+      enableHighAccuracy: true,
+      maximumAge: 1000,
+      timeout: 10000,
+    });
+  }
+
+  // --- Button handlers ---
+  startBtn.addEventListener('click', () => {
+    if (!state.lastLoc) {
+      showHud('No GPS fix yet — try again');
+      return;
+    }
+    state.startPoint = { lat: state.lastLoc.lat, lon: state.lastLoc.lon };
+    statusEl.textContent = 'Start point saved';
+    logBtn.disabled = false;
+    resetBtn.disabled = false;
+    resetBtn.classList.add('active');
+  });
+
+  logBtn.addEventListener('click', () => {
+    if (!state.startPoint || !state.lastLoc) {
+      showHud('No GPS fix — could not log');
+      return;
+    }
+    const dist = haversine(
+      state.startPoint.lat, state.startPoint.lon,
+      state.lastLoc.lat, state.lastLoc.lon
+    );
+    const distText = formatDistance(dist);
+    const now = new Date();
+    const ts = now.toTimeString().slice(0, 8);
+    state.logEntries.unshift({ ts, val: distText });
+    renderLog();
+    exportBtn.disabled = false;
+  });
+
+  resetBtn.addEventListener('click', () => {
+    state.startPoint = null;
+    distEl.textContent = '0 ft';
+    statusEl.textContent = 'Ready';
+    logBtn.disabled = true;
+    resetBtn.disabled = true;
+    resetBtn.classList.remove('active');
+  });
+
+  clearBtn.addEventListener('click', () => {
+    state.logEntries = [];
+    renderLog();
+    exportBtn.disabled = true;
+  });
+
+  exportBtn.addEventListener('click', () => {
+    if (!state.logEntries.length) return;
+    const now = new Date();
+    const header = `-- Session: ${now.toLocaleDateString()} ${now.toLocaleTimeString()} --\n`;
+    const body = state.logEntries.map(e => `[${e.ts}] ${e.val}`).join('\n');
+    const blob = new Blob([header + body + '\n'], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `distance_log_${now.toISOString().slice(0,10)}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+
+    exportBtn.textContent = 'SAVED';
+    exportBtn.classList.add('saved');
+    setTimeout(() => {
+      exportBtn.textContent = 'Export Log';
+      exportBtn.classList.remove('saved');
+    }, 2000);
+  });
+
+  // --- Render log ---
+  function renderLog() {
+    if (!state.logEntries.length) {
+      logView.innerHTML = '<span class="empty">No entries yet</span>';
+      return;
+    }
+    logView.innerHTML = state.logEntries.map(e =>
+      `<div class="entry"><span class="ts">[${e.ts}]</span><span class="val">${e.val}</span></div>`
+    ).join('');
+  }
+
+  // --- HUD toast ---
+  function showHud(msg) {
+    let hud = document.getElementById('hud');
+    if (!hud) {
+      hud = document.createElement('div');
+      hud.id = 'hud';
+      Object.assign(hud.style, {
+        position: 'fixed', bottom: '80px', left: '50%', transform: 'translateX(-50%)',
+        background: '#1e1e2e', color: '#e2e2f0', padding: '10px 20px',
+        borderRadius: '20px', fontSize: '13px', fontFamily: 'Azeret Mono, monospace',
+        zIndex: '999', border: '1px solid #2e2e4e', whiteSpace: 'nowrap',
+        transition: 'opacity 0.3s',
+      });
+      document.body.appendChild(hud);
+    }
+    hud.textContent = msg;
+    hud.style.opacity = '1';
+    clearTimeout(hud._t);
+    hud._t = setTimeout(() => { hud.style.opacity = '0'; }, 2000);
+  }
+
+  // --- Wake lock (keep screen on) ---
+  async function requestWakeLock() {
+    if ('wakeLock' in navigator) {
+      try {
+        await navigator.wakeLock.request('screen');
+      } catch (_) {}
+    }
+  }
+
+  // --- Init ---
+  startWatching();
+  requestWakeLock();
+</script>
+
+</body>
+</html>
