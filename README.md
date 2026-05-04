@@ -1,1 +1,56 @@
-tst
+# Distance Tracker
+
+A lightweight progressive web app for measuring straight-line GPS distance from a set start point. Log and export timestamped readings — no app store required.
+
+## Installation
+
+1. Open the link in **Safari** on iPhone (Chrome and other browsers do not support all required features)
+1. Tap the **Share** button at the bottom of the screen
+1. Tap **“Add to Home Screen”**
+1. Launch from your home screen for the full-screen experience
+
+## Usage
+
+1. Open the app and wait for the signal accuracy indicator to turn **green**
+1. Tap **Set Start Point** to lock in your origin location
+1. Move around — distance updates live on screen
+1. Tap **Log Distance** at any point to record a timestamped reading
+1. Tap **Export Log** at the end of your session to download a `.txt` file of all recorded entries
+
+## Signal Accuracy
+
+The accuracy indicator shows the GPS margin of error and uses a traffic light system:
+
+|Color   |Accuracy          |Meaning                    |
+|--------|------------------|---------------------------|
+|🟢 Green |+/- 16ft or better|Good to go                 |
+|🟠 Orange|+/- 17–30ft       |Usable, some drift possible|
+|🔴 Red   |+/- 31ft or worse |Wait for a better fix      |
+
+Always wait for green before setting your start point for the most reliable readings.
+
+## Limitations
+
+- **Screen must stay on** — GPS updates pause if the screen locks or you switch apps. Keep the screen active for the duration of your session.
+- **Straight-line distance only** — measures the direct distance from your start point, not the total path traveled.
+- **Safari only** — other iOS browsers do not support the required GPS and wake lock APIs.
+- **Accuracy varies** — signal quality depends on your environment. Open sky gives the best results; dense buildings or tree cover will reduce accuracy.
+
+## Export Format
+
+Exported logs are saved as plain `.txt` files with one entry per line:
+
+```
+-- Session: 5/3/2026 7:08:01 PM --
+[19:08:01] 0 ft
+[19:10:22] 142 ft
+[19:14:05] 0.31 mi
+```
+
+Files are saved to your Downloads folder or can be shared via the iOS share sheet.
+
+## Tips
+
+- Disable auto-lock in **Settings > Display & Brightness > Auto-Lock** before a long session
+- Keep screen brightness up — low power mode can throttle GPS
+- If accuracy stays red indoors, try moving near a window or stepping outside briefly
