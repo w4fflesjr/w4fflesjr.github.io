@@ -9,7 +9,7 @@ A lightweight progressive web app for measuring straight-line GPS distance from 
 1. Open the link in **Safari** (Chrome and other browsers do not support all required GPS features on iOS)
 1. Bookmark it or keep the tab open for easy access
 
-> **Note:** Adding to Home Screen is not recommended on iPhone — iOS restricts location access for home screen web apps.
+> **Note:** You can add it to your Home Screen on iPhone, but when prompted uncheck “Open as Web App” — this ensures location access works correctly.
 
 **Android:**
 
